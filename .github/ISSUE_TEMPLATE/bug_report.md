@@ -10,6 +10,11 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Did you try deleting the configuration files?**
+Yes/No
+
+(run `rm -rf $HOME/.config/crunchyroll-linux/` in terminal to remove config files)
+
 **To Reproduce**
 Steps to reproduce the behavior:
 1. Go to '...'
