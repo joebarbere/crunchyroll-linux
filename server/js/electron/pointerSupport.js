@@ -356,6 +356,21 @@
     } catch (err) {}
   }
 
+  // Prevent the app's <input> fields from taking NATIVE focus on click. The TV
+  // UI manages its own text entry (login/search keyDown handlers write into the
+  // input's value). If the browser also focused the input, every keystroke would
+  // be inserted twice — once natively and once by the app handler. Blocking focus
+  // here makes the app handler the single writer, consistent with keyboard-only
+  // navigation (where the input is never focused either).
+  function handleMouseDown(e) {
+    try {
+      var el = e.target;
+      if (el && el.closest && el.closest("input, textarea")) {
+        e.preventDefault();
+      }
+    } catch (err) {}
+  }
+
   var wheelThrottle = 0;
   function handleWheel(e) {
     try {
@@ -390,6 +405,7 @@
     try {
       injectStyles();
       removeBlocker();
+      document.addEventListener("mousedown", handleMouseDown, true);
       document.addEventListener("mousemove", handleHover, true);
       document.addEventListener("click", handleClick, true);
       document.addEventListener("contextmenu", handleContext, true);
