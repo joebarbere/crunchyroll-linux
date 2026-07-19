@@ -135,7 +135,13 @@ window.search = {
       case tvKey.KEY_ENTER:
       case tvKey.KEY_PANEL_ENTER:
         if (this.position === -1) {
-          keyboard.init(search.input, search.start);
+          // If text was typed on a physical keyboard, run the search directly;
+          // otherwise fall back to the on-screen keyboard for remote users.
+          if (search.input && search.input.value) {
+            search.start();
+          } else {
+            keyboard.init(search.input, search.start);
+          }
         } else {
           home_details.init(
             search.data.result[search.position],
@@ -177,6 +183,16 @@ window.search = {
               search.toggleFocus(search.position)
             }
           );
+        }
+        break;
+      default:
+        // Physical-keyboard typing directly into the search box.
+        if (search.position === -1 && search.input) {
+          if (event.key && event.key.length === 1) {
+            search.input.value += event.key;
+          } else if (event.keyCode === 8) {
+            search.input.value = search.input.value.slice(0, -1);
+          }
         }
         break;
     }

@@ -22,6 +22,14 @@
 
 This is a Linux port of the [Unofficial Tizen Crunchyroll App](https://github.com/jhassan8/crunchyroll-tizen).
 
+> **Fork note (mouse & keyboard support):** This fork adds full mouse and
+> physical-keyboard support to the TV-style interface. Hover to highlight,
+> click to select/play, right-click to go back, and scroll to navigate lists;
+> arrow keys / Enter / Esc drive every screen and you can type your email,
+> password and searches on a real keyboard. The upstream "Cursor and keyboard
+> is not supported" message is removed. Controller support is unchanged.
+> See [`server/js/electron/pointerSupport.js`](server/js/electron/pointerSupport.js).
+
 # Features
 
 Note that this is just a port of the Unofficial Tizen Crunchyroll App, there's currently no plans for to do any additional dev work or add new features. PRs are welcome.

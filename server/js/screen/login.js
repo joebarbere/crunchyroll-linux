@@ -49,6 +49,18 @@ window.login = {
       case tvKey.KEY_PANEL_ENTER:
         login.action(this.selected);
         break;
+      default:
+        // Physical-keyboard typing directly into the focused field.
+        var opts = document.getElementsByClassName(login.id + "-option");
+        var input = opts[login.selected] && opts[login.selected].firstElementChild;
+        if (input && input.tagName === "INPUT") {
+          if (event.key && event.key.length === 1) {
+            input.value += event.key;
+          } else if (event.keyCode === 8) {
+            input.value = input.value.slice(0, -1);
+          }
+        }
+        break;
     }
   },
 

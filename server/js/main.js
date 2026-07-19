@@ -14,7 +14,9 @@ window.main = {
     session.init();
     translate.init();
     main.events.login();
-    main.preventClickMessage();
+    // Cursor/keyboard are supported in this build (see pointerSupport.js);
+    // the old "not supported" click blocker is intentionally not shown.
+    // main.preventClickMessage();
 
     // TODO: temporal config for LG
     tvKey.IS_KEY_BACK = function (keyCode) {
