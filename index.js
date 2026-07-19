@@ -1,6 +1,11 @@
 const electron = require("electron");
-const { app, BrowserWindow, ipcMain } = electron;
+const { app, BrowserWindow, ipcMain, clipboard } = electron;
 const path = require("path");
+
+// Expose the system clipboard to the renderer for paste support (Ctrl+V /
+// right-click) into the login and search fields. Registered once at module
+// load so re-creating the window never double-registers the handler.
+ipcMain.handle("readClipboard", () => clipboard.readText());
 
 function createWindow() {
   let fullscreen = false;

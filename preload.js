@@ -4,4 +4,5 @@ contextBridge.exposeInMainWorld("electronUtilsRender", {
   gamepadButtonPress: (buttonName) =>
     ipcRenderer.send("gamepadButtonPress", buttonName),
   exitApp: () => ipcRenderer.send("exitApp"),
+  readClipboard: () => ipcRenderer.invoke("readClipboard"),
 });

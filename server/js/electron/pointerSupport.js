@@ -339,9 +339,86 @@
     }
   }
 
+  /* ---- paste support (Ctrl+V / right-click) ---- */
+
+  // The text field the app currently considers active, so Ctrl+V knows where to
+  // paste even though the native <input> is never focused.
+  function currentInput() {
+    try {
+      if (main.state === "login-screen" && window.login) {
+        var opts = document.getElementsByClassName("login-screen-option");
+        var o = opts[login.selected];
+        return o ? o.querySelector("input") : null;
+      }
+      if (
+        main.state === "search-screen" &&
+        window.search &&
+        search.position === -1
+      ) {
+        return (
+          search.input || document.querySelector("#search-screen_input input")
+        );
+      }
+    } catch (err) {}
+    return null;
+  }
+
+  function insertText(inputEl, text) {
+    if (!inputEl || !text) return;
+    // strip newlines so a copied line with a trailing return stays one line
+    inputEl.value += String(text).replace(/[\r\n]+/g, "");
+  }
+
+  function pasteInto(inputEl) {
+    if (!inputEl) return;
+    try {
+      if (window.electronUtilsRender && electronUtilsRender.readClipboard) {
+        var r = electronUtilsRender.readClipboard();
+        if (r && typeof r.then === "function") {
+          r.then(function (text) {
+            insertText(inputEl, text);
+          }).catch(function () {});
+        } else {
+          insertText(inputEl, r);
+        }
+      } else if (navigator.clipboard && navigator.clipboard.readText) {
+        // fallback if the preload bridge is unavailable
+        navigator.clipboard
+          .readText()
+          .then(function (text) {
+            insertText(inputEl, text);
+          })
+          .catch(function () {});
+      }
+    } catch (err) {}
+  }
+
+  // Intercept Ctrl/Cmd+V in the capture phase so it pastes instead of typing a
+  // literal "v" (the keystroke never reaches the app's own keyDown handler).
+  function handleKeyDown(e) {
+    try {
+      var isV = e.key === "v" || e.key === "V" || e.keyCode === 86;
+      if ((e.ctrlKey || e.metaKey) && isV) {
+        var input = currentInput();
+        if (input) {
+          e.preventDefault();
+          e.stopPropagation();
+          pasteInto(input);
+        }
+      }
+    } catch (err) {}
+  }
+
   function handleContext(e) {
     try {
       e.preventDefault();
+      // Right-click inside a text field pastes; elsewhere it means "back".
+      var input =
+        e.target && e.target.closest ? e.target.closest("input, textarea") : null;
+      if (input) {
+        pasteInto(input);
+        return;
+      }
       press(KEY.BACK);
     } catch (err) {}
   }
@@ -405,6 +482,7 @@
     try {
       injectStyles();
       removeBlocker();
+      document.addEventListener("keydown", handleKeyDown, true);
       document.addEventListener("mousedown", handleMouseDown, true);
       document.addEventListener("mousemove", handleHover, true);
       document.addEventListener("click", handleClick, true);
